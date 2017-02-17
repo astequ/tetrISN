@@ -23,8 +23,8 @@ def trace(lis):
             if lis[i][j] == 1:
                 placesquare(j,i)
 
-def place(pos):
-    global shape,state
+def place(pos,state):
+    global shape
     x,y = pos[0],pos[1]
     lis = [[0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
@@ -181,8 +181,10 @@ def place(pos):
               lis[x+1][y] = 1
     return lis
 
-def check(mov): #pour le moment il ne fait que vérifier si ça sort pas de la zone de jeu, c'est du gros wip
-    global fixed, piece
+def check(mov,fstate): #pour le moment il ne fait que vérifier si ça sort pas de la zone de jeu, c'est du gros wip
+    #mov est dans le cas d'un mouvement, mettre à 0 pour une rotation
+    #fstate (futurestate c'trop long) est dans le cas d'une rotation, donne l'état voulu de la pièce (pas l'actuel), mettre à 0 pour un déplacement
+    global fixed, piece, pos
     mirai = list(piece)
     out = 1
     if mov == 1:
@@ -217,14 +219,16 @@ def check(mov): #pour le moment il ne fait que vérifier si ça sort pas de la z
         else:
             print("on est à fond à gauche")
             out = 0
+    elif mov == 0:
+        mirai = place(pos,fstate)
     return out
 
 def mirai(): #TEST
-    global pos, piece
+    global pos, piece, state
     pos = (pos[0],pos[1]-1)
-    k = check(3)
+    k = check(3,0)
     if k == 1:
-        piece = place(pos)
+        piece = place(pos,state)
         trace(piece)
 
 wdw = Tk()
@@ -283,7 +287,7 @@ pos = (0,4)
 main = Canvas(width=300,height=660,bg="white")
 main.pack()
 
-trace(place(pos))
+trace(place(pos,state))
 
 test = Frame(wdw)
 Label(test,text="x").pack()
