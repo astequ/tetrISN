@@ -1,2 +1,2 @@
 # tetrISN
-Les tetris pour l'ISN
+Le tetris pour l'ISN
