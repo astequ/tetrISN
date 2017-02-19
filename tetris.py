@@ -13,17 +13,17 @@ def randum(): #TEST
     piece = place(pos,state)
     trace(piece)
 
-def placesquare(x,y):
+def placesquare(x,y): #trace un carré avec tag falling
     main.create_rectangle(coord(x),coord(y),coord(x+1),coord(y+1),tags=("falling"))
 
-def trace(lis):
+def trace(lis): #trace le contenu d'une liste
     main.delete("falling")
     for i in range(22):
         for j in range(10):
             if lis[i][j] == 1:
                 placesquare(j,i)
 
-def place(pos,state):
+def place(pos,state): #dispose une pièce sur une liste définie
     global shape, flipok
     x,y = pos[0],pos[1]
     lis = [[0,0,0,0,0,0,0,0,0,0],
@@ -73,8 +73,8 @@ def place(pos,state):
         elif shape == 2:
             lis[x][y] = 1
             lis[x][y+1] = 1
-            lis[x-1][y+1] = 1
-            lis[x-1][y] = 1
+            lis[x+1][y+1] = 1
+            lis[x+1][y] = 1
         elif shape == 3:
             if state == 1:
                 lis[x][y] = 1
@@ -181,20 +181,19 @@ def place(pos,state):
                   lis[x-1][y-1] = 1
                   lis[x+1][y] = 1
     except:
-        flipok == 0
+        flipok = 0
     return lis
 
-def check(mov,fstate): #pour le moment il ne fait que vérifier si ça sort pas de la zone de jeu, c'est du gros wip
-    #mov est dans le cas d'un mouvement, mettre à 0 pour une rotation
-    #fstate (futurestate c'trop long) est dans le cas d'une rotation, donne l'état voulu de la pièce (pas l'actuel), mettre à 0 pour un déplacement
+def check(mov,fstate): #vérifie qu'un mouvement est valide
     global fixed, piece, pos, flipok
     mirai = list(piece)
     out = 1
     if mov == 1:
         if mirai[-1] == [0,0,0,0,0,0,0,0,0,0]:
-            mirai = mirai[-1]+mirai[:-1]
+            mirai == mirai[:-1]
+            mirai.insert(0,[0,0,0,0,0,0,0,0,0,0])
+
         else:
-            print("on est au plus bas")
             out = 0
     elif mov == 2:
         empty = 1
@@ -207,7 +206,6 @@ def check(mov,fstate): #pour le moment il ne fait que vérifier si ça sort pas 
                 mirai[i] = mirai[i][:-1]
                 mirai[i].insert(0,element)
         else:
-            print("on est à fond à droite")
             out = 0
     elif mov == 3:
         empty = 1
@@ -217,22 +215,27 @@ def check(mov,fstate): #pour le moment il ne fait que vérifier si ça sort pas 
         if empty == 1:
             for i in range(22):
                 element = mirai[i][0]
-                mirai[i] = mirai[i][0:]
+                mirai[i] = mirai[i][1:]
                 mirai[i].append(element)
         else:
-            print("on est à fond à gauche")
             out = 0
     elif mov == 0:
         mirai = place(pos,fstate)
         if flipok == 0:
-            print("on peut pas tourner")
             out = 0
-            flipok == 1
+            flipok = 1
+    if out == 1:
+        1+1
+        for i in range(22):
+            for j in range(10):
+                if fixed[i][j]+mirai[i][j] == 2:
+                    out = 0
     return out
 
-def mirai(bisou): #TEST
-    global pos, piece, state, tstate
+def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive de gestion des déplacements. Faudra changer son nom du coup
+    global pos, piece, state
     temppos = pos
+    tstate = state
     if bisou == 1:
         temppos = (pos[0],pos[1]-1)
         k = check(3,0)
@@ -244,7 +247,7 @@ def mirai(bisou): #TEST
         k = check(1,0)
     elif bisou == 4:
         tstate += 1
-        if tstate ==5:
+        if tstate == 5:
             tstate = 1
         k = check(0,tstate)
     if k == 1:
@@ -252,6 +255,45 @@ def mirai(bisou): #TEST
         state = tstate
         piece = place(pos,state)
         trace(piece)
+        color()
+
+def fixpiece(): #fixe la position d'une pièce
+    global piece, fixed
+    main.dtag("falling")
+    for i in range(22):
+        for j in range(10):
+            fixed[i][j] = piece[i][j]+fixed[i][j]
+        piece[i] = [0,0,0,0,0,0,0,0,0,0]
+        print(piece[i]," | ",fixed[i])
+    resetpiece()
+
+def resetpiece(): #fait popper une nouvelle pièce, est appelée par fixpiece()
+    global shape, state, pos
+    shape = randint(1,7)
+    state = 1
+    pos = (0,4)
+    trace(place(pos,state))
+    color()
+
+def color(): #colore la pièce en mouvement, à appeler à chaque retraçage
+    global shape
+    if shape == 1:
+        color = "cyan"
+    elif shape == 2:
+        color = "gold"
+    elif shape == 3:
+        color = "purple"
+    elif shape == 4:
+        color = "orange"
+    elif shape == 5:
+        color = "blue"
+    elif shape == 6:
+        color = "red"
+    elif shape == 7:
+        color = "green"
+    main.itemconfig("falling",fill=color)
+
+
 
 wdw = Tk()
 
@@ -301,17 +343,15 @@ piece = [[0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0]]
 
-#shape = randint(1,7)
-shape = 1
-state = 1
-pos = (0,4)
-tstate = 1
 flipok = 1
 
 main = Canvas(width=300,height=660,bg="white")
-main.pack()
+main.pack(side = LEFT)
 
-trace(place(pos,state))
+trace(fixed)
+main.dtag("falling")
+
+resetpiece()
 
 test = Frame(wdw)
 Label(test,text="x").pack()
@@ -328,14 +368,13 @@ es = Entry(test)
 es.pack()
 ok = Button(test,text="go", command=randum)
 ok.pack()
-ch = Button(test,text="Gauche", command=lambda:mirai(1))
-ch.pack()
-ch1 = Button(test,text="Droite", command=lambda:mirai(2))
-ch1.pack()
-ch2 = Button(test,text="Bas", command=lambda:mirai(3))
-ch2.pack()
-ch3 = Button(test,text="Ori", command=lambda:mirai(4))
-ch3.pack()
+fix = Button(test,text="Fix", command=fixpiece)
+fix.pack()
+test.pack(side = RIGHT)
 
-test.pack()
+wdw.bind("<Up>",lambda e:mirai(4))
+wdw.bind("<Down>",lambda e:mirai(3))
+wdw.bind("<Left>",lambda e:mirai(1))
+wdw.bind("<Right>",lambda e:mirai(2))
+
 wdw.mainloop()
