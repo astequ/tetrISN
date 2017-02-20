@@ -1,7 +1,7 @@
 from tkinter import *
 from random import randint
 
-def coord(z):
+def coord(z): #permet de passer de coordonnées de type grille de jeu (10 de large, 22 de haut) à des coordonnées en pixels pour l'affichage (300 de large, 660 de haut)
     return z*30
 
 def randum(): #TEST
@@ -17,8 +17,8 @@ def placesquare(x,y): #trace un carré avec tag falling
     main.create_rectangle(coord(x),coord(y),coord(x+1),coord(y+1),tags=("falling"))
 
 def trace(lis): #trace le contenu d'une liste
-    main.delete("falling")
-    for i in range(22):
+    main.delete("falling") #suppression de la pièce précédente
+    for i in range(22): #traçage de la nouvelle pièce
         for j in range(10):
             if lis[i][j] == 1:
                 placesquare(j,i)
@@ -26,30 +26,11 @@ def trace(lis): #trace le contenu d'une liste
 def place(pos,state): #dispose une pièce sur une liste définie
     global shape, flipok
     x,y = pos[0],pos[1]
-    lis = [[0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0]]
+    lis = []
+    for i in range(22): #génération d'une liste temporaire
+        lis.append([0,0,0,0,0,0,0,0,0,0])
     try:
-        if shape == 1:
+        if shape == 1: #génération d'une barre
             if state == 1:
                 lis[x][y] = 1
                 lis[x][y-1] = 1
@@ -70,12 +51,12 @@ def place(pos,state): #dispose une pièce sur une liste définie
                 lis[x-1][y] = 1
                 lis[x+1][y] = 1
                 lis[x+2][y] = 1
-        elif shape == 2:
+        elif shape == 2: #génération d'un carré
             lis[x][y] = 1
             lis[x][y+1] = 1
             lis[x+1][y+1] = 1
             lis[x+1][y] = 1
-        elif shape == 3:
+        elif shape == 3: #génération d'un T
             if state == 1:
                 lis[x][y] = 1
                 lis[x][y-1] = 1
@@ -96,7 +77,7 @@ def place(pos,state): #dispose une pièce sur une liste définie
                 lis[x-1][y] = 1
                 lis[x+1][y] = 1
                 lis[x][y+1] = 1
-        elif shape == 4:
+        elif shape == 4: #génération d'un L
             if state == 1:
                 lis[x][y] = 1
                 lis[x][y-1] = 1
@@ -117,7 +98,7 @@ def place(pos,state): #dispose une pièce sur une liste définie
                 lis[x-1][y] = 1
                 lis[x+1][y] = 1
                 lis[x+1][y+1] = 1
-        elif shape == 5:
+        elif shape == 5: #génération d'un L inversé
             if state == 1:
                 lis[x][y] = 1
                 lis[x][y+1] = 1
@@ -138,7 +119,7 @@ def place(pos,state): #dispose une pièce sur une liste définie
                 lis[x+1][y] = 1
                 lis[x-1][y] = 1
                 lis[x-1][y+1] = 1
-        elif shape == 6:
+        elif shape == 6: #génération d'un Z
               if state == 1:
                   lis[x][y] = 1
                   lis[x][y-1] = 1
@@ -159,7 +140,7 @@ def place(pos,state): #dispose une pièce sur une liste définie
                   lis[x-1][y] = 1
                   lis[x][y-1] = 1
                   lis[x+1][y-1] = 1
-        elif shape == 7:
+        elif shape == 7: #génération d'un Z inversé
               if state == 1:
                   lis[x][y] = 1
                   lis[x][y+1] = 1
@@ -181,56 +162,55 @@ def place(pos,state): #dispose une pièce sur une liste définie
                   lis[x-1][y-1] = 1
                   lis[x+1][y] = 1
     except:
-        flipok = 0
+        flipok = 0 #utile pour la fonction check(), si un placement est impossible on lui fait savoir en changeant l'état de cette variable globale
     return lis
 
 def check(mov,fstate): #vérifie qu'un mouvement est valide
     global fixed, piece, pos, flipok
     mirai = list(piece)
     out = 1
-    if mov == 1:
-        if mirai[-1] == [0,0,0,0,0,0,0,0,0,0]:
-            mirai == mirai[:-1]
+    #les trois premières conditions vérifient que le mouvement voulu ne fait pas sortir la pièce de l'aire de jeu, puis génère une liste contenant la position future de la pièce
+    if mov == 1: #vérifie pour un déplacement vers le bas
+        if mirai[-1] == [0,0,0,0,0,0,0,0,0,0]: #vérification que la pièce ne touche pas le sol
+            mirai == mirai[:-1] #génération de la liste
             mirai.insert(0,[0,0,0,0,0,0,0,0,0,0])
-
         else:
             out = 0
-    elif mov == 2:
+    elif mov == 2: #vérifie pour un déplacement vers la droite
         empty = 1
-        for i in range(22):
+        for i in range(22): #vérification que la pièce n'est pas collée au bord vers lequel elle doit se déplacer
             if mirai[i][-1] == 1:
                 empty = 0
-        if empty == 1:
+        if empty == 1: #génération de la liste
             for i in range(22):
                 element = mirai[i][-1]
                 mirai[i] = mirai[i][:-1]
                 mirai[i].insert(0,element)
         else:
             out = 0
-    elif mov == 3:
+    elif mov == 3: #vérifie pour un déplacement vers la gauche
         empty = 1
-        for i in range(22):
+        for i in range(22): #vérification que la pièce n'est pas collée au bord vers lequel elle doit se déplacer
             if mirai[i][0] == 1:
                 empty = 0
-        if empty == 1:
+        if empty == 1: #génération de la liste
             for i in range(22):
                 element = mirai[i][0]
                 mirai[i] = mirai[i][1:]
                 mirai[i].append(element)
         else:
             out = 0
-    elif mov == 0:
-        mirai = place(pos,fstate)
-        if flipok == 0:
+    elif mov == 0: #cas spéciel d'une rotation
+        mirai = place(pos,fstate) #on tente de retracer la pièce, si elle dépasse une exception aura lieu et changera l'état de flipok
+        if flipok == 0: #cas où la rotation n'est pas valide
             out = 0
-            flipok = 1
-    if out == 1:
-        1+1
+            flipok = 1 #on réinitialise flipok (qui est une variable globale) pour le prochain test
+    if out == 1: #si aucune sortie de l'aire de jeu n'a été décelée, on teste les collisions entre pièces
         for i in range(22):
             for j in range(10):
-                if fixed[i][j]+mirai[i][j] == 2:
+                if fixed[i][j]+mirai[i][j] == 2: #pour chaque position on aditionne le contenu de la liste anticipant le déplacement générée plus haut avec celui de la liste en charge des pièces déjà posées. Si le résultat vaut 2, alors il y a superposition
                     out = 0
-    return out
+    return out #par défaut à 1 (action possible), la variable out sera mise à 0 (action impossible) à la moindre erreur détectée
 
 def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive de gestion des déplacements. Faudra changer son nom du coup
     global pos, piece, state
@@ -245,26 +225,27 @@ def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive 
     elif bisou == 3:
         temppos = (pos[0]+1,pos[1])
         k = check(1,0)
-    elif bisou == 4:
+    elif bisou == 4: #gère les 4 états de rotation
         tstate += 1
         if tstate == 5:
             tstate = 1
         k = check(0,tstate)
-    if k == 1:
+        if pos[0] == 0: #force à interdire la rotation au premier rang
+            k = 0
+    if k == 1: #si le mouvement est accepté, on l'applique et on retrace tout
         pos = temppos
         state = tstate
         piece = place(pos,state)
         trace(piece)
-        color()
+        main.itemconfig("falling",fill=color())
 
 def fixpiece(): #fixe la position d'une pièce
     global piece, fixed
-    main.dtag("falling")
+    main.dtag("falling") #retire le tag fallind de la pièce afin de la rendre insensible aux effacements de trace()
     for i in range(22):
         for j in range(10):
-            fixed[i][j] = piece[i][j]+fixed[i][j]
-        piece[i] = [0,0,0,0,0,0,0,0,0,0]
-        print(piece[i]," | ",fixed[i])
+            fixed[i][j] = piece[i][j]+fixed[i][j] #fusionne la liste contenant la pièce en mouvement avec celle contenant les pièces déjà posées
+        piece[i] = [0,0,0,0,0,0,0,0,0,0] #réinitialise la liste contenant la pièce en mouvement
     resetpiece()
 
 def resetpiece(): #fait popper une nouvelle pièce, est appelée par fixpiece()
@@ -273,9 +254,9 @@ def resetpiece(): #fait popper une nouvelle pièce, est appelée par fixpiece()
     state = 1
     pos = (0,4)
     trace(place(pos,state))
-    color()
+    main.itemconfig("falling",fill=color())
 
-def color(): #colore la pièce en mouvement, à appeler à chaque retraçage
+def color(): #donne une couleur en fonction de la pièce
     global shape
     if shape == 1:
         color = "cyan"
@@ -291,57 +272,16 @@ def color(): #colore la pièce en mouvement, à appeler à chaque retraçage
         color = "red"
     elif shape == 7:
         color = "green"
-    main.itemconfig("falling",fill=color)
-
-
+    return color
 
 wdw = Tk()
 
-fixed = [[0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0]]
-
-piece = [[0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0]]
+#chaque ligne de la grille est représentée par une liste, et la grille est une liste de ces listes, ce qui permet de facilement accéder à un élément précis de la grille en utilisant les indices des listes comme des coordonnées
+fixed = [] #liste contenant les éléments déjà posés
+piece = [] #liste contenant les éléments en mouvement
+for i in range(22): #génération des listes suivant le format expliqué plus haut
+    fixed.append([0,0,0,0,0,0,0,0,0,0])
+    piece.append([0,0,0,0,0,0,0,0,0,0])
 
 flipok = 1
 
