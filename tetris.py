@@ -249,11 +249,12 @@ def fixpiece(): #fixe la position d'une pièce
     resetpiece()
 
 def resetpiece(): #fait popper une nouvelle pièce, est appelée par fixpiece()
-    global shape, state, pos
+    global shape, state, pos, piece
     shape = randint(1,7)
     state = 1
     pos = (0,4)
-    trace(place(pos,state))
+    piece = place(pos,state)
+    trace(piece)
     main.itemconfig("falling",fill=color())
 
 def color(): #donne une couleur en fonction de la pièce
