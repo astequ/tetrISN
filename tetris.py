@@ -200,11 +200,13 @@ def check(mov,fstate): #vérifie qu'un mouvement est valide
                 mirai[i].append(element)
         else:
             out = 0
-    elif mov == 0: #cas spéciel d'une rotation
+    elif mov == 0: #cas spécial d'une rotation
         mirai = place(pos,fstate) #on tente de retracer la pièce, si elle dépasse une exception aura lieu et changera l'état de flipok
         if flipok == 0: #cas où la rotation n'est pas valide
             out = 0
             flipok = 1 #on réinitialise flipok (qui est une variable globale) pour le prochain test
+        elif pos[0] == 0 or pos[1] == 0: #force à interdire la rotation au premier rang (haut et gauche)
+            out = 0
     if out == 1: #si aucune sortie de l'aire de jeu n'a été décelée, on teste les collisions entre pièces
         for i in range(22):
             for j in range(10):
@@ -230,8 +232,6 @@ def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive 
         if tstate == 5:
             tstate = 1
         k = check(0,tstate)
-        if pos[0] == 0: #force à interdire la rotation au premier rang
-            k = 0
     if k == 1: #si le mouvement est accepté, on l'applique et on retrace tout
         pos = temppos
         state = tstate
