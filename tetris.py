@@ -4,14 +4,7 @@ from random import randint
 def coord(z): #permet de passer de coordonnées de type grille de jeu (10 de large, 22 de haut) à des coordonnées en pixels pour l'affichage (300 de large, 660 de haut)
     return z*30
 
-def randum(): #TEST
-    global shape, state, pos, piece
-    main.delete("falling")
-    pos = (int(ex.get()),int(ey.get()))
-    state = int(es.get())
-    shape = int(et.get())
-    piece = place(pos,state)
-    trace(piece)
+
 
 def placesquare(x,y): #trace un carré avec tag falling
     main.create_rectangle(coord(x),coord(y),coord(x+1),coord(y+1),tags=("falling"))
@@ -215,7 +208,7 @@ def check(mov,fstate): #vérifie qu'un mouvement est valide
     return out #par défaut à 1 (action possible), la variable out sera mise à 0 (action impossible) à la moindre erreur détectée
 
 def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive de gestion des déplacements. Faudra changer son nom du coup
-    global pos, piece, state
+    global pos, piece, state, shape
     temppos = pos
     tstate = state
     if bisou == 1:
@@ -237,14 +230,44 @@ def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive 
         state = tstate
         piece = place(pos,state)
         trace(piece)
-        main.itemconfig("falling",fill=color())
+        main.itemconfig("falling",fill=color(shape))
+
+
+def cardinal ():
+    mirai(3)
+    if check(1,0)==0:
+        fixpiece()
+        illya()
+    wdw.after(600,cardinal)
+
+
+def illya ():
+    global fixed, shade
+    for i in range (22):
+        if fixed[i] == [1,1,1,1,1,1,1,1,1,1]:
+            fixed = fixed[:i] + fixed[i+1:]
+            fixed.insert(0,[0,0,0,0,0,0,0,0,0,0])
+            shade = shade[:i] + shade[i+1:]
+            shade.insert(0,[0,0,0,0,0,0,0,0,0,0])
+            main.delete("all")
+            for w in range(22):
+                for j in range(10):
+                    if fixed[w][j] == 1:
+                        main.create_rectangle(coord(j),coord(w),coord(j+1),coord(w+1),fill=color(shade[w][j]))
+
+
+        
+            
+
 
 def fixpiece(): #fixe la position d'une pièce
-    global piece, fixed
+    global piece, fixed, shape, shade
     main.dtag("falling") #retire le tag fallind de la pièce afin de la rendre insensible aux effacements de trace()
     for i in range(22):
         for j in range(10):
             fixed[i][j] = piece[i][j]+fixed[i][j] #fusionne la liste contenant la pièce en mouvement avec celle contenant les pièces déjà posées
+            if piece[i][j] == 1:
+                shade[i][j] = shape
         piece[i] = [0,0,0,0,0,0,0,0,0,0] #réinitialise la liste contenant la pièce en mouvement
     resetpiece()
 
@@ -255,10 +278,9 @@ def resetpiece(): #fait popper une nouvelle pièce, est appelée par fixpiece()
     pos = (0,4)
     piece = place(pos,state)
     trace(piece)
-    main.itemconfig("falling",fill=color())
+    main.itemconfig("falling",fill=color(shape))
 
-def color(): #donne une couleur en fonction de la pièce
-    global shape
+def color(shape): #donne une couleur en fonction de la pièce
     if shape == 1:
         color = "cyan"
     elif shape == 2:
@@ -280,9 +302,11 @@ wdw = Tk()
 #chaque ligne de la grille est représentée par une liste, et la grille est une liste de ces listes, ce qui permet de facilement accéder à un élément précis de la grille en utilisant les indices des listes comme des coordonnées
 fixed = [] #liste contenant les éléments déjà posés
 piece = [] #liste contenant les éléments en mouvement
+shade = []
 for i in range(22): #génération des listes suivant le format expliqué plus haut
     fixed.append([0,0,0,0,0,0,0,0,0,0])
     piece.append([0,0,0,0,0,0,0,0,0,0])
+    shade.append([0,0,0,0,0,0,0,0,0,0])
 
 flipok = 1
 
@@ -294,25 +318,10 @@ main.dtag("falling")
 
 resetpiece()
 
-test = Frame(wdw)
-Label(test,text="x").pack()
-ex = Entry(test)
-ex.pack()
-Label(test,text="y").pack()
-ey = Entry(test)
-ey.pack()
-Label(test,text="type").pack()
-et = Entry(test)
-et.pack()
-Label(test,text="state").pack()
-es = Entry(test)
-es.pack()
-ok = Button(test,text="go", command=randum)
-ok.pack()
-fix = Button(test,text="Fix", command=fixpiece)
-fix.pack()
-test.pack(side = RIGHT)
+fix = Button(text="Fix", command=fixpiece)
+fix.pack(side = RIGHT)
 
+cardinal()
 wdw.bind("<Up>",lambda e:mirai(4))
 wdw.bind("<Down>",lambda e:mirai(3))
 wdw.bind("<Left>",lambda e:mirai(1))
