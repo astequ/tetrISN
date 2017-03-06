@@ -11,16 +11,16 @@ def placesquare(x,y): #trace un carré avec tag falling
 
 def trace(lis): #trace le contenu d'une liste
     main.delete("falling") #suppression de la pièce précédente
-    for i in range(22): #traçage de la nouvelle pièce
+    for i in range(2,24): #traçage de la nouvelle pièce
         for j in range(10):
             if lis[i][j] == 1:
-                placesquare(j,i)
+                placesquare(j,i-2)
 
 def place(pos,state): #dispose une pièce sur une liste définie
     global shape, flipok
     x,y = pos[0],pos[1]
     lis = []
-    for i in range(22): #génération d'une liste temporaire
+    for i in range(24): #génération d'une liste temporaire
         lis.append([0,0,0,0,0,0,0,0,0,0])
     try:
         if shape == 1: #génération d'une barre
@@ -171,11 +171,11 @@ def check(mov,fstate): #vérifie qu'un mouvement est valide
             out = 0
     elif mov == 2: #vérifie pour un déplacement vers la droite
         empty = 1
-        for i in range(22): #vérification que la pièce n'est pas collée au bord vers lequel elle doit se déplacer
+        for i in range(24): #vérification que la pièce n'est pas collée au bord vers lequel elle doit se déplacer
             if mirai[i][-1] == 1:
                 empty = 0
         if empty == 1: #génération de la liste
-            for i in range(22):
+            for i in range(24):
                 element = mirai[i][-1]
                 mirai[i] = mirai[i][:-1]
                 mirai[i].insert(0,element)
@@ -183,11 +183,11 @@ def check(mov,fstate): #vérifie qu'un mouvement est valide
             out = 0
     elif mov == 3: #vérifie pour un déplacement vers la gauche
         empty = 1
-        for i in range(22): #vérification que la pièce n'est pas collée au bord vers lequel elle doit se déplacer
+        for i in range(24): #vérification que la pièce n'est pas collée au bord vers lequel elle doit se déplacer
             if mirai[i][0] == 1:
                 empty = 0
         if empty == 1: #génération de la liste
-            for i in range(22):
+            for i in range(24):
                 element = mirai[i][0]
                 mirai[i] = mirai[i][1:]
                 mirai[i].append(element)
@@ -201,7 +201,7 @@ def check(mov,fstate): #vérifie qu'un mouvement est valide
         elif pos[0] == 0 or pos[1] == 0: #force à interdire la rotation au premier rang (haut et gauche)
             out = 0
     if out == 1: #si aucune sortie de l'aire de jeu n'a été décelée, on teste les collisions entre pièces
-        for i in range(22):
+        for i in range(24):
             for j in range(10):
                 if fixed[i][j]+mirai[i][j] == 2: #pour chaque position on aditionne le contenu de la liste anticipant le déplacement générée plus haut avec celui de la liste en charge des pièces déjà posées. Si le résultat vaut 2, alors il y a superposition
                     out = 0
@@ -234,36 +234,37 @@ def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive 
 
 
 def cardinal ():
-    mirai(3)
     if check(1,0)==0:
         fixpiece()
         illya()
+    else:
+        mirai(3)
     wdw.after(600,cardinal)
 
 
 def illya ():
     global fixed, shade
-    for i in range (22):
+    for i in range (24):
         if fixed[i] == [1,1,1,1,1,1,1,1,1,1]:
             fixed = fixed[:i] + fixed[i+1:]
             fixed.insert(0,[0,0,0,0,0,0,0,0,0,0])
             shade = shade[:i] + shade[i+1:]
             shade.insert(0,[0,0,0,0,0,0,0,0,0,0])
             main.delete("all")
-            for w in range(22):
+            for w in range(2,24):
                 for j in range(10):
                     if fixed[w][j] == 1:
-                        main.create_rectangle(coord(j),coord(w),coord(j+1),coord(w+1),fill=color(shade[w][j]))
+                        main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill=color(shade[w][j]))
 
 
-        
-            
+
+
 
 
 def fixpiece(): #fixe la position d'une pièce
     global piece, fixed, shape, shade
     main.dtag("falling") #retire le tag fallind de la pièce afin de la rendre insensible aux effacements de trace()
-    for i in range(22):
+    for i in range(24):
         for j in range(10):
             fixed[i][j] = piece[i][j]+fixed[i][j] #fusionne la liste contenant la pièce en mouvement avec celle contenant les pièces déjà posées
             if piece[i][j] == 1:
@@ -303,7 +304,7 @@ wdw = Tk()
 fixed = [] #liste contenant les éléments déjà posés
 piece = [] #liste contenant les éléments en mouvement
 shade = []
-for i in range(22): #génération des listes suivant le format expliqué plus haut
+for i in range(24): #génération des listes suivant le format expliqué plus haut
     fixed.append([0,0,0,0,0,0,0,0,0,0])
     piece.append([0,0,0,0,0,0,0,0,0,0])
     shade.append([0,0,0,0,0,0,0,0,0,0])
