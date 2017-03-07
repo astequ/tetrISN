@@ -4,8 +4,6 @@ from random import randint
 def coord(z): #permet de passer de coordonnées de type grille de jeu (10 de large, 22 de haut) à des coordonnées en pixels pour l'affichage (300 de large, 660 de haut)
     return z*30
 
-
-
 def placesquare(x,y): #trace un carré avec tag falling
     main.create_rectangle(coord(x),coord(y),coord(x+1),coord(y+1),tags=("falling"))
 
@@ -321,15 +319,12 @@ for i in range(24): #génération des listes suivant le format expliqué plus ha
 flipok = 1
 
 main = Canvas(width=300,height=660,bg="white")
-main.pack(side = LEFT)
+main.grid(row=0, column=0)
 
 trace(fixed)
 main.dtag("falling")
 
 resetpiece()
-
-fix = Button(text="Fix", command=fixpiece)
-fix.pack(side = RIGHT)
 
 cardinal()
 wdw.bind("<Up>",lambda e:mirai(4))
