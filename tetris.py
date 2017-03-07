@@ -158,8 +158,8 @@ def place(pos,state): #dispose une pièce sur une liste définie
         flipok = 0 #utile pour la fonction check(), si un placement est impossible on lui fait savoir en changeant l'état de cette variable globale
     return lis
 
-def check(mov,fstate): #vérifie qu'un mouvement est valide
-    global fixed, piece, pos, flipok
+def check(mov,fstate,pos,piece): #vérifie qu'un mouvement est valide
+    global fixed, flipok
     mirai = list(piece)
     out = 1
     #les trois premières conditions vérifient que le mouvement voulu ne fait pas sortir la pièce de l'aire de jeu, puis génère une liste contenant la position future de la pièce
@@ -213,34 +213,34 @@ def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive 
     tstate = state
     if bisou == 1:
         temppos = (pos[0],pos[1]-1)
-        k = check(3,0)
+        k = check(3,0,pos,piece)
     elif bisou == 2:
         temppos = (pos[0],pos[1]+1)
-        k = check(2,0)
+        k = check(2,0,pos,piece)
     elif bisou == 3:
         temppos = (pos[0]+1,pos[1])
-        k = check(1,0)
+        k = check(1,0,pos,piece)
     elif bisou == 4: #gère les 4 états de rotation
         tstate += 1
         if tstate == 5:
             tstate = 1
-        k = check(0,tstate)
+        k = check(0,tstate,pos,piece)
     if k == 1: #si le mouvement est accepté, on l'applique et on retrace tout
         pos = temppos
         state = tstate
         piece = place(pos,state)
         trace(piece)
         main.itemconfig("falling",fill=color(shape))
-
+        ghost()
 
 def cardinal ():
-    if check(1,0)==0:
+    global pos, piece
+    if check(1,0,pos,piece)==0:
         fixpiece()
         illya()
     else:
         mirai(3)
     wdw.after(600,cardinal)
-
 
 def illya ():
     global fixed, shade
@@ -256,10 +256,19 @@ def illya ():
                     if fixed[w][j] == 1:
                         main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill=color(shade[w][j]))
 
-
-
-
-
+def ghost():
+    main.delete("plop")
+    global pos, shape, state, piece
+    localpos = (2,pos[1])
+    for i in range(1,24):
+        ghostpiece = place(localpos,state)
+        if check(1,0,localpos,ghostpiece) == 1:
+            localpos = (localpos[0]+1,localpos[1])
+    ghostpiece = place(localpos,state)
+    for w in range(2,24):
+        for j in range(10):
+            if ghostpiece[w][j] == 1 and piece[w][j] == 0 and localpos[0] > pos[0]:
+                main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill="pink",tags="plop")
 
 def fixpiece(): #fixe la position d'une pièce
     global piece, fixed, shape, shade
