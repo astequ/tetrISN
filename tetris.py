@@ -259,15 +259,15 @@ def illya ():
 def ghost():
     main.delete("plop")
     global pos, shape, state, piece
-    localpos = (2,pos[1])
-    for i in range(1,24):
+    localpos = pos
+    for i in range(24-pos[0]):
         ghostpiece = place(localpos,state)
         if check(1,0,localpos,ghostpiece) == 1:
             localpos = (localpos[0]+1,localpos[1])
     ghostpiece = place(localpos,state)
     for w in range(2,24):
         for j in range(10):
-            if ghostpiece[w][j] == 1 and piece[w][j] == 0 and localpos[0] > pos[0]:
+            if ghostpiece[w][j] == 1 and piece[w][j] == 0:
                 main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill="pink",tags="plop")
 
 def fixpiece(): #fixe la position d'une pièce
