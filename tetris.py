@@ -235,7 +235,8 @@ def death ():
     global fixed, keep
     if fixed[1] != [0,0,0,0,0,0,0,0,0,0]:
         keep = 0
-        main.create_rectangle(30,210,270,400,fill="black")
+        #main.create_rectangle(30,210,270,400,fill="black")
+        main.create_image(80, 200, anchor=NW, image=dedpic)
 
 def rezero (event):
     global fixed, piece, shade, keep
@@ -342,6 +343,7 @@ for i in range(24): #génération des listes suivant le format expliqué plus ha
 
 flipok = 1
 keep = 1
+dedpic = PhotoImage(file="ded.png")
 
 main = Canvas(width=300,height=660,bg="white")
 main.grid(row=0, column=0)
