@@ -231,14 +231,38 @@ def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive 
         main.itemconfig("falling",fill=color(shape))
         ghost()
 
+def death ():
+    global fixed, keep
+    if fixed[1] != [0,0,0,0,0,0,0,0,0,0]:
+        keep = 0
+        main.create_rectangle(30,210,270,400,fill="black")
+
+def rezero (event):
+    global fixed, piece, shade, keep
+    if keep == 0:
+        main.delete("all")
+        fixed = [] #liste contenant les éléments déjà posés
+        piece = [] #liste contenant les éléments en mouvement
+        shade = []
+        for i in range(24): #génération des listes suivant le format expliqué plus haut
+            fixed.append([0,0,0,0,0,0,0,0,0,0])
+            piece.append([0,0,0,0,0,0,0,0,0,0])
+            shade.append([0,0,0,0,0,0,0,0,0,0])
+        keep = 1
+        cardinal()
+    else:
+        print("meurs dignement, couard")
+
 def cardinal ():
-    global pos, piece
+    global pos, piece, keep
     if check(1,0,pos,piece)==0:
         fixpiece()
         illya()
     else:
         mirai(3)
-    wdw.after(600,cardinal)
+    death()
+    if keep == 1:
+        wdw.after(600,cardinal)
 
 def illya ():
     global fixed, shade
@@ -317,6 +341,7 @@ for i in range(24): #génération des listes suivant le format expliqué plus ha
     shade.append([0,0,0,0,0,0,0,0,0,0])
 
 flipok = 1
+keep = 1
 
 main = Canvas(width=300,height=660,bg="white")
 main.grid(row=0, column=0)
@@ -331,5 +356,7 @@ wdw.bind("<Up>",lambda e:mirai(4))
 wdw.bind("<Down>",lambda e:mirai(3))
 wdw.bind("<Left>",lambda e:mirai(1))
 wdw.bind("<Right>",lambda e:mirai(2))
+wdw.bind("<r>",rezero)
+
 
 wdw.mainloop()
