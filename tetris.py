@@ -265,7 +265,7 @@ def cardinal ():
     if keep == 1:
         wdw.after(600,cardinal)
 
-def illya ():
+def illya():
     global fixed, shade
     for i in range (24):
         if fixed[i] == [1,1,1,1,1,1,1,1,1,1]:
@@ -292,6 +292,15 @@ def ghost():
         for j in range(10):
             if ghostpiece[w][j] == 1 and piece[w][j] == 0:
                 main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill="pink",tags="plop")
+    return(ghostpiece)
+
+def harddrop(event):
+    global piece, shape
+    piece = ghost()
+    trace(piece)
+    main.itemconfig("falling",fill=color(shape))
+    fixpiece()
+    illya()
 
 def fixpiece(): #fixe la position d'une pièce
     global piece, fixed, shape, shade
@@ -359,6 +368,6 @@ wdw.bind("<Down>",lambda e:mirai(3))
 wdw.bind("<Left>",lambda e:mirai(1))
 wdw.bind("<Right>",lambda e:mirai(2))
 wdw.bind("<r>",rezero)
-
+wdw.bind("<Return>",harddrop)
 
 wdw.mainloop()
