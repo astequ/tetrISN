@@ -313,16 +313,34 @@ def fixpiece(): #fixe la position d'une pièce
             if piece[i][j] == 1:
                 shade[i][j] = shape
         piece[i] = [0,0,0,0,0,0,0,0,0,0] #réinitialise la liste contenant la pièce en mouvement
-    resetpiece()
+    resetpiece(0)
 
-def resetpiece(): #fait popper une nouvelle pièce, est appelée par fixpiece()
-    global shape, state, pos, piece
-    shape = randint(1,7)
+def resetpiece(twice): #fait popper une nouvelle pièce, est appelée par fixpiece()
+    global shape, state, pos, piece, nshape
+    if twice == 1:
+        shape = randint(1,7)
+        nshape = randint(1,7)
+    else:
+        shape = nshape
+        nshape = randint(1,7)
+    preview()
     state = 1
     pos = (0,4)
     piece = place(pos,state)
     trace(piece)
     main.itemconfig("falling",fill=color(shape))
+    
+ def preview():
+    global shape, nshape
+    aside.delete("preview")
+    temp = shape
+    shape = nshape
+    prev = place((1,1),1)
+    for i in range(4):
+        for j in range(4):
+            if prev[i][j] == 1:
+                aside.create_rectangle(coord(j)+10,coord(i),coord(j+1)+10,coord(i+1),tags="preview",fill=color(shape))
+    shape = temp
 
 def color(shape): #donne une couleur en fonction de la pièce
     if shape == 1:
@@ -368,8 +386,14 @@ dedpic = PhotoImage(file="ded.png")
 main = Canvas(width=300,height=660,bg="black")
 main.grid(row=0, column=0)
 
+aside = Canvas(width=140,height=660,bg="white")
+aside.grid(row=0, column=1)
+
 trace(fixed)
 main.dtag("falling")
+
+resetpiece(1)
+cardinal()
 
 resetpiece()
 
