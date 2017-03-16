@@ -236,7 +236,7 @@ def death ():
     if fixed[1] != [0,0,0,0,0,0,0,0,0,0]:
         keep = 0
         #main.create_rectangle(30,210,270,400,fill="black")
-        main.create_image(80, 200, anchor=NW, image=dedpic)
+        main.create_image(0,0, anchor=NW, image=dedpic)
 
 def rezero (event):
     global fixed, piece, shade, keep
