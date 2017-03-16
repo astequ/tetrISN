@@ -330,7 +330,7 @@ def resetpiece(twice): #fait popper une nouvelle pièce, est appelée par fixpie
     trace(piece)
     main.itemconfig("falling",fill=color(shape))
     
- def preview():
+def preview():
     global shape, nshape
     aside.delete("preview")
     temp = shape
@@ -394,8 +394,6 @@ main.dtag("falling")
 
 resetpiece(1)
 cardinal()
-
-resetpiece()
 
 cardinal()
 wdw.bind("<Up>",lambda e:mirai(4))
