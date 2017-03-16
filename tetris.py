@@ -206,37 +206,38 @@ def check(mov,fstate,pos,piece): #vérifie qu'un mouvement est valide
     return out #par défaut à 1 (action possible), la variable out sera mise à 0 (action impossible) à la moindre erreur détectée
 
 def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive de gestion des déplacements. Faudra changer son nom du coup
-    global pos, piece, state, shape
-    temppos = pos
-    tstate = state
-    if bisou == 1:
-        temppos = (pos[0],pos[1]-1)
-        k = check(3,0,pos,piece)
-    elif bisou == 2:
-        temppos = (pos[0],pos[1]+1)
-        k = check(2,0,pos,piece)
-    elif bisou == 3:
-        temppos = (pos[0]+1,pos[1])
-        k = check(1,0,pos,piece)
-    elif bisou == 4: #gère les 4 états de rotation
-        tstate += 1
-        if tstate == 5:
-            tstate = 1
-        k = check(0,tstate,pos,piece)
-    if k == 1: #si le mouvement est accepté, on l'applique et on retrace tout
-        pos = temppos
-        state = tstate
-        piece = place(pos,state)
-        trace(piece)
-        main.itemconfig("falling",fill=color(shape))
-        ghost()
+    global pos, piece, state, shape, pause
+    if pause == 0:
+        temppos = pos
+        tstate = state
+        if bisou == 1:
+            temppos = (pos[0],pos[1]-1)
+            k = check(3,0,pos,piece)
+        elif bisou == 2:
+            temppos = (pos[0],pos[1]+1)
+            k = check(2,0,pos,piece)
+        elif bisou == 3:
+            temppos = (pos[0]+1,pos[1])
+            k = check(1,0,pos,piece)
+        elif bisou == 4: #gère les 4 états de rotation
+            tstate += 1
+            if tstate == 5:
+                tstate = 1
+            k = check(0,tstate,pos,piece)
+        if k == 1: #si le mouvement est accepté, on l'applique et on retrace tout
+            pos = temppos
+            state = tstate
+            piece = place(pos,state)
+            trace(piece)
+            main.itemconfig("falling",fill=color(shape))
+            ghost()
 
 def death ():
     global fixed, keep
     if fixed[1] != [0,0,0,0,0,0,0,0,0,0]:
         keep = 0
         #main.create_rectangle(30,210,270,400,fill="black")
-        main.create_image(0,0, anchor=NW, image=dedpic)
+        main.create_image(80, 200, anchor=NW, image=dedpic)
 
 def rezero (event):
     global fixed, piece, shade, keep
@@ -262,7 +263,7 @@ def cardinal ():
     else:
         mirai(3)
     death()
-    if keep == 1:
+    if keep == 1 and pause == 0:
         wdw.after(600,cardinal)
 
 def illya():
@@ -291,16 +292,17 @@ def ghost():
     for w in range(2,24):
         for j in range(10):
             if ghostpiece[w][j] == 1 and piece[w][j] == 0:
-                main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill="pink",tags="plop")
+                main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill="dim gray",tags="plop")
     return(ghostpiece)
 
 def harddrop(event):
-    global piece, shape
-    piece = ghost()
-    trace(piece)
-    main.itemconfig("falling",fill=color(shape))
-    fixpiece()
-    illya()
+    global piece, shape, pause
+    if pause == 0:
+        piece = ghost()
+        trace(piece)
+        main.itemconfig("falling",fill=color(shape))
+        fixpiece()
+        illya()
 
 def fixpiece(): #fixe la position d'une pièce
     global piece, fixed, shape, shade
@@ -339,6 +341,14 @@ def color(shape): #donne une couleur en fonction de la pièce
         color = "green"
     return color
 
+def ohwait(plz):
+    global pause
+    if pause == 0:
+        pause = 1
+    else:
+        pause = 0
+        cardinal()
+
 wdw = Tk()
 
 #chaque ligne de la grille est représentée par une liste, et la grille est une liste de ces listes, ce qui permet de facilement accéder à un élément précis de la grille en utilisant les indices des listes comme des coordonnées
@@ -352,9 +362,10 @@ for i in range(24): #génération des listes suivant le format expliqué plus ha
 
 flipok = 1
 keep = 1
+pause = 0
 dedpic = PhotoImage(file="ded.png")
 
-main = Canvas(width=300,height=660,bg="white")
+main = Canvas(width=300,height=660,bg="black")
 main.grid(row=0, column=0)
 
 trace(fixed)
@@ -368,6 +379,7 @@ wdw.bind("<Down>",lambda e:mirai(3))
 wdw.bind("<Left>",lambda e:mirai(1))
 wdw.bind("<Right>",lambda e:mirai(2))
 wdw.bind("<r>",rezero)
+wdw.bind("<p>",ohwait)
 wdw.bind("<Return>",harddrop)
 
 wdw.mainloop()
