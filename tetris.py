@@ -206,8 +206,8 @@ def check(mov,fstate,pos,piece): #vérifie qu'un mouvement est valide
     return out #par défaut à 1 (action possible), la variable out sera mise à 0 (action impossible) à la moindre erreur détectée
 
 def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive de gestion des déplacements. Faudra changer son nom du coup
-    global pos, piece, state, shape, pause
-    if pause == 0:
+    global pos, piece, state, shape, pause, keep
+    if pause == 0 and keep == 1:
         temppos = pos
         tstate = state
         if bisou == 1:
@@ -296,8 +296,8 @@ def ghost():
     return(ghostpiece)
 
 def harddrop(event):
-    global piece, shape, pause
-    if pause == 0:
+    global piece, shape, pause, keep
+    if pause == 0 and keep == 1:
         piece = ghost()
         trace(piece)
         main.itemconfig("falling",fill=color(shape))
@@ -329,7 +329,7 @@ def resetpiece(twice): #fait popper une nouvelle pièce, est appelée par fixpie
     piece = place(pos,state)
     trace(piece)
     main.itemconfig("falling",fill=color(shape))
-    
+
 def preview():
     global shape, nshape
     aside.delete("preview")
@@ -360,12 +360,15 @@ def color(shape): #donne une couleur en fonction de la pièce
     return color
 
 def ohwait(plz):
-    global pause
-    if pause == 0:
-        pause = 1
-    else:
-        pause = 0
-        cardinal()
+    global pause, keep
+    if keep == 1:
+        if pause == 0:
+            pause = 1
+            main.create_image(1,1, anchor=NW, image=pausepic, tags="pause")
+        else:
+            pause = 0
+            main.delete("pause")
+            cardinal()
 
 wdw = Tk()
 
@@ -382,6 +385,7 @@ flipok = 1
 keep = 1
 pause = 0
 dedpic = PhotoImage(file="ded.png")
+pausepic = PhotoImage(file="pause.png")
 
 main = Canvas(width=300,height=660,bg="black")
 main.grid(row=0, column=0)
