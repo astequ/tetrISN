@@ -158,41 +158,41 @@ def place(pos,state): #dispose une pièce sur une liste définie
 
 def check(mov,fstate,pos,piece): #vérifie qu'un mouvement est valide
     global fixed, flipok
-    mirai = list(piece)
+    future = list(piece)
     out = 1
     #les trois premières conditions vérifient que le mouvement voulu ne fait pas sortir la pièce de l'aire de jeu, puis génère une liste contenant la position future de la pièce
     if mov == 1: #vérifie pour un déplacement vers le bas
-        if mirai[-1] == [0,0,0,0,0,0,0,0,0,0]: #vérification que la pièce ne touche pas le sol
-            mirai == mirai[:-1] #génération de la liste
-            mirai.insert(0,[0,0,0,0,0,0,0,0,0,0])
+        if future[-1] == [0,0,0,0,0,0,0,0,0,0]: #vérification que la pièce ne touche pas le sol
+            future == future[:-1] #génération de la liste
+            future.insert(0,[0,0,0,0,0,0,0,0,0,0])
         else:
             out = 0
     elif mov == 2: #vérifie pour un déplacement vers la droite
         empty = 1
         for i in range(24): #vérification que la pièce n'est pas collée au bord vers lequel elle doit se déplacer
-            if mirai[i][-1] == 1:
+            if future[i][-1] == 1:
                 empty = 0
         if empty == 1: #génération de la liste
             for i in range(24):
-                element = mirai[i][-1]
-                mirai[i] = mirai[i][:-1]
-                mirai[i].insert(0,element)
+                element = future[i][-1]
+                future[i] = future[i][:-1]
+                future[i].insert(0,element)
         else:
             out = 0
     elif mov == 3: #vérifie pour un déplacement vers la gauche
         empty = 1
         for i in range(24): #vérification que la pièce n'est pas collée au bord vers lequel elle doit se déplacer
-            if mirai[i][0] == 1:
+            if future[i][0] == 1:
                 empty = 0
         if empty == 1: #génération de la liste
             for i in range(24):
-                element = mirai[i][0]
-                mirai[i] = mirai[i][1:]
-                mirai[i].append(element)
+                element = future[i][0]
+                future[i] = future[i][1:]
+                future[i].append(element)
         else:
             out = 0
     elif mov == 0: #cas spécial d'une rotation
-        mirai = place(pos,fstate) #on tente de retracer la pièce, si elle dépasse une exception aura lieu et changera l'état de flipok
+        future = place(pos,fstate) #on tente de retracer la pièce, si elle dépasse une exception aura lieu et changera l'état de flipok
         if flipok == 0: #cas où la rotation n'est pas valide
             out = 0
             flipok = 1 #on réinitialise flipok (qui est une variable globale) pour le prochain test
@@ -201,25 +201,25 @@ def check(mov,fstate,pos,piece): #vérifie qu'un mouvement est valide
     if out == 1: #si aucune sortie de l'aire de jeu n'a été décelée, on teste les collisions entre pièces
         for i in range(24):
             for j in range(10):
-                if fixed[i][j]+mirai[i][j] == 2: #pour chaque position on aditionne le contenu de la liste anticipant le déplacement générée plus haut avec celui de la liste en charge des pièces déjà posées. Si le résultat vaut 2, alors il y a superposition
+                if fixed[i][j]+future[i][j] == 2: #pour chaque position on aditionne le contenu de la liste anticipant le déplacement générée plus haut avec celui de la liste en charge des pièces déjà posées. Si le résultat vaut 2, alors il y a superposition
                     out = 0
     return out #par défaut à 1 (action possible), la variable out sera mise à 0 (action impossible) à la moindre erreur détectée
 
-def mirai(bisou): #à la base c'tait du test mais c'est la fonction définitive de gestion des déplacements. Faudra changer son nom du coup
+def future(direct): #à la base c'tait du test mais c'est la fonction définitive de gestion des déplacements. Faudra changer son nom du coup
     global pos, piece, state, shape, pause, keep
     if pause == 0 and keep == 1:
         temppos = pos
         tstate = state
-        if bisou == 1:
+        if direct == 1:
             temppos = (pos[0],pos[1]-1)
             k = check(3,0,pos,piece)
-        elif bisou == 2:
+        elif direct == 2:
             temppos = (pos[0],pos[1]+1)
             k = check(2,0,pos,piece)
-        elif bisou == 3:
+        elif direct == 3:
             temppos = (pos[0]+1,pos[1])
             k = check(1,0,pos,piece)
-        elif bisou == 4: #gère les 4 états de rotation
+        elif direct == 4: #gère les 4 états de rotation
             tstate += 1
             if tstate == 5:
                 tstate = 1
@@ -239,7 +239,7 @@ def death ():
         #main.create_rectangle(30,210,270,400,fill="black")
         main.create_image(0,0, anchor=NW, image=dedpic)
 
-def rezero (event):
+def reset (event):
     global fixed, piece, shade, keep
     if keep == 0:
         main.delete("all")
@@ -251,22 +251,22 @@ def rezero (event):
             piece.append([0,0,0,0,0,0,0,0,0,0])
             shade.append([0,0,0,0,0,0,0,0,0,0])
         keep = 1
-        cardinal()
+        master()
     else:
         print("meurs dignement, couard")
 
-def cardinal ():
+def master ():
     global pos, piece, keep
     if check(1,0,pos,piece)==0:
         fixpiece()
-        illya()
+        findline()
     else:
-        mirai(3)
+        future(3)
     death()
     if keep == 1 and pause == 0:
-        wdw.after(600,cardinal)
+        wdw.after(600,master)
 
-def illya():
+def findline():
     global fixed, shade
     for i in range (24):
         if fixed[i] == [1,1,1,1,1,1,1,1,1,1]:
@@ -302,7 +302,7 @@ def harddrop(event):
         trace(piece)
         main.itemconfig("falling",fill=color(shape))
         fixpiece()
-        illya()
+        findline()
 
 def fixpiece(): #fixe la position d'une pièce
     global piece, fixed, shape, shade
@@ -368,7 +368,7 @@ def ohwait(plz):
         else:
             pause = 0
             main.delete("pause")
-            cardinal()
+            master()
 
 wdw = Tk()
 
@@ -397,14 +397,14 @@ trace(fixed)
 main.dtag("falling")
 
 resetpiece(1)
-cardinal()
+master()
 
-cardinal()
-wdw.bind("<Up>",lambda e:mirai(4))
-wdw.bind("<Down>",lambda e:mirai(3))
-wdw.bind("<Left>",lambda e:mirai(1))
-wdw.bind("<Right>",lambda e:mirai(2))
-wdw.bind("<r>",rezero)
+master()
+wdw.bind("<Up>",lambda e:future(4))
+wdw.bind("<Down>",lambda e:future(3))
+wdw.bind("<Left>",lambda e:future(1))
+wdw.bind("<Right>",lambda e:future(2))
+wdw.bind("<r>",reset)
 wdw.bind("<p>",ohwait)
 wdw.bind("<Return>",harddrop)
 
