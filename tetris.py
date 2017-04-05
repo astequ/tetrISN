@@ -1,3 +1,5 @@
+#-*- coding: utf-8 -*-
+
 from tkinter import *
 from random import randint
 
@@ -205,12 +207,12 @@ def check(mov,fstate,pos,piece): #vérifie qu'un mouvement est valide
                     out = 0
     return out #par défaut à 1 (action possible), la variable out sera mise à 0 (action impossible) à la moindre erreur détectée
 
-def future(direct): #à la base c'tait du test mais c'est la fonction définitive de gestion des déplacements. Faudra changer son nom du coup
+def future(direct): #gère les déplacements de la pièce actuelle
     global pos, piece, state, shape, pause, keep
-    if pause == 0 and keep == 1:
+    if pause == 0 and keep == 1: #la pièce n'est déplaçable que si le jeu n'est pas en pause et que la partie est en cours
         temppos = pos
         tstate = state
-        if direct == 1:
+        if direct == 1: #on vérifie pour les 4 directions si le mouvement est valable en faisant appel à check()
             temppos = (pos[0],pos[1]-1)
             k = check(3,0,pos,piece)
         elif direct == 2:
@@ -229,80 +231,80 @@ def future(direct): #à la base c'tait du test mais c'est la fonction définitiv
             state = tstate
             piece = place(pos,state)
             trace(piece)
-            main.itemconfig("falling",fill=color(shape))
-            ghost()
+            main.itemconfig("falling",fill=color(shape)) #on applique la couleur à la pièce en mouvement
+            ghost() #on met à jour l'aperçu du lieu d'arrivée de la pièce
 
 def death ():
     global fixed, keep
-    if fixed[1] != [0,0,0,0,0,0,0,0,0,0]:
-        keep = 0
+    if fixed[1] != [0,0,0,0,0,0,0,0,0,0]: #la grille fait 24 rangs de haut mais n'en affiche que 22, on détecte la mort en voyant si une pièce est posée en dehors de la zone affichée
+        keep = 0 #on arrête le jeu
         #main.create_rectangle(30,210,270,400,fill="black")
-        main.create_image(0,0, anchor=NW, image=dedpic)
+        main.create_image(0,0, anchor=NW, image=dedpic) #on affiche l'écran de mort
 
-def reset (event):
+def reset (event): #recommence la partie
     global fixed, piece, shade, keep
-    if keep == 0:
+    if keep == 0: #on ne peut recommencer que si la partie est perdue
         main.delete("all")
-        fixed = [] #liste contenant les éléments déjà posés
-        piece = [] #liste contenant les éléments en mouvement
+        fixed = []
+        piece = []
         shade = []
         for i in range(24): #génération des listes suivant le format expliqué plus haut
             fixed.append([0,0,0,0,0,0,0,0,0,0])
             piece.append([0,0,0,0,0,0,0,0,0,0])
             shade.append([0,0,0,0,0,0,0,0,0,0])
         keep = 1
-        master()
+        master() #on réinitialise les pièces affichées, les variables et on relance le jeu
     else:
-        print("meurs dignement, couard")
+        print("meurs dignement, couard") #faut bien motiver le joueur :3
 
-def master ():
+def master (): #coordonne les autres fonctions, gère le rythme du jeu
     global pos, piece, keep
-    if check(1,0,pos,piece)==0:
+    if check(1,0,pos,piece)==0: #pose la pièce si un déplacement vers le bas est impossible
         fixpiece()
         findline()
-    else:
+    else: #effectue un déplacement vers le bas dans le cas inverse
         future(3)
-    death()
-    if keep == 1 and pause == 0:
+    death() #vérifie que la partie n'est pas perdue
+    if keep == 1 and pause == 0: #se relance d'elle-même si la partie n'est pas perdue et le jeu n'est pas en pause
         wdw.after(600,master)
 
-def findline():
+def findline(): #détecte une ligne complétée
     global fixed, shade
-    for i in range (24):
-        if fixed[i] == [1,1,1,1,1,1,1,1,1,1]:
-            fixed = fixed[:i] + fixed[i+1:]
-            fixed.insert(0,[0,0,0,0,0,0,0,0,0,0])
-            shade = shade[:i] + shade[i+1:]
+    for i in range (24): #parcourt toutes les lignes une à une
+        if fixed[i] == [1,1,1,1,1,1,1,1,1,1]: #si la ligne est pleine
+            fixed = fixed[:i] + fixed[i+1:] #on supprime la ligne
+            fixed.insert(0,[0,0,0,0,0,0,0,0,0,0]) #on remet une ligne vide au rang le plus haut
+            shade = shade[:i] + shade[i+1:] #on effectue les mêmes opérations pour la liste en charge des couleurs
             shade.insert(0,[0,0,0,0,0,0,0,0,0,0])
-            main.delete("all")
+            main.delete("all") #on supprime puis on retrace tout
             for w in range(2,24):
                 for j in range(10):
                     if fixed[w][j] == 1:
                         main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill=color(shade[w][j]))
 
-def ghost():
-    main.delete("plop")
+def ghost(): #aperçu du lieu de chute de la pièce
+    main.delete("plop") #supprime l'ancien aperçu
     global pos, shape, state, piece
-    localpos = pos
-    for i in range(24-pos[0]):
-        ghostpiece = place(localpos,state)
-        if check(1,0,localpos,ghostpiece) == 1:
+    localpos = pos #position de l'aperçu
+    for i in range(24-pos[0]): #on part de la position de la pièce actuelle avant de vérifier pour tous les rangs inférieurs
+        ghostpiece = place(localpos,state) #génère une liste contenant l'emplacement de l'aperçu
+        if check(1,0,localpos,ghostpiece) == 1: #si un déplacement vers le bas est possible, on l'effectue
             localpos = (localpos[0]+1,localpos[1])
-    ghostpiece = place(localpos,state)
-    for w in range(2,24):
+    ghostpiece = place(localpos,state) #on met à jour la liste avant la suite du traitement
+    for w in range(2,24): #on trace l'aperçu en parcourant chaque case de la grille
         for j in range(10):
-            if ghostpiece[w][j] == 1 and piece[w][j] == 0:
+            if ghostpiece[w][j] == 1 and piece[w][j] == 0: #si la pièce en mouvement ne se superpose pas à son aperçu, on trace l'aperçu
                 main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill="dim gray",tags="plop")
-    return(ghostpiece)
+    return(ghostpiece) #retourne la position de la pièce, utile pour le hard drop
 
-def harddrop(event):
+def harddrop(event): #effectue un hard drop (pose la pièce instantanément au plus bas possible)
     global piece, shape, pause, keep
-    if pause == 0 and keep == 1:
-        piece = ghost()
-        trace(piece)
-        main.itemconfig("falling",fill=color(shape))
-        fixpiece()
-        findline()
+    if pause == 0 and keep == 1: #si la partie n'est pas perdue et le jeu n'est pas en pause
+        piece = ghost() #on met la pièce à l'emplacement de son aperçu
+        trace(piece) #on retrace la pièce
+        main.itemconfig("falling",fill=color(shape)) #on applique sa couleur à la pièce
+        fixpiece() #on pose la pièce
+        findline() #on vérifie si une ligne n'est pas complétée
 
 def fixpiece(): #fixe la position d'une pièce
     global piece, fixed, shape, shade
@@ -315,22 +317,22 @@ def fixpiece(): #fixe la position d'une pièce
         piece[i] = [0,0,0,0,0,0,0,0,0,0] #réinitialise la liste contenant la pièce en mouvement
     resetpiece(0)
 
-def resetpiece(twice): #fait popper une nouvelle pièce, est appelée par fixpiece()
+def resetpiece(twice): #fait popper une nouvelle pièce et prévoit la suivante, est appelée par fixpiece()
     global shape, state, pos, piece, nshape
-    if twice == 1:
+    if twice == 1: #génère deux nombres aléatoires pour le premier lancement
         shape = randint(1,7)
         nshape = randint(1,7)
     else:
         shape = nshape
         nshape = randint(1,7)
-    preview()
-    state = 1
+    preview() #trace l'aperçu
+    state = 1 #initialise toutes les variables caractérisant la nouvelle pièce
     pos = (0,4)
-    piece = place(pos,state)
-    trace(piece)
-    main.itemconfig("falling",fill=color(shape))
+    piece = place(pos,state) #génère la liste de la pièce
+    trace(piece) #trace la pièce
+    main.itemconfig("falling",fill=color(shape)) #applique sa couleur à la pièce
 
-def preview():
+def preview(): #affiche la pièce à venir
     global shape, nshape
     aside.delete("preview")
     temp = shape
@@ -359,23 +361,25 @@ def color(shape): #donne une couleur en fonction de la pièce
         color = "green"
     return color
 
-def ohwait(plz):
+def ohwait(plz): #met le jeu en pause
     global pause, keep
-    if keep == 1:
-        if pause == 0:
-            pause = 1
-            main.create_image(1,1, anchor=NW, image=pausepic, tags="pause")
-        else:
-            pause = 0
-            main.delete("pause")
-            master()
+    if keep == 1: #si la partie n'est pas perdue
+        if pause == 0: #si le jeu n'est pas en pause
+            pause = 1 #on met le jeu en pause
+            main.create_image(1,1, anchor=NW, image=pausepic, tags="pause") #on affiche l'écran de pause
+        else: #si le jeu est en pause
+            pause = 0 #on annule la pause
+            main.delete("pause") #on supprime l'écran de pause
+            master() #on relance la fonction principale
 
 wdw = Tk()
+wdw.title("TetrISN")
+wdw.resizable(width=False, height=False)
 
 #chaque ligne de la grille est représentée par une liste, et la grille est une liste de ces listes, ce qui permet de facilement accéder à un élément précis de la grille en utilisant les indices des listes comme des coordonnées
 fixed = [] #liste contenant les éléments déjà posés
 piece = [] #liste contenant les éléments en mouvement
-shade = []
+shade = [] #liste contenant les couleurs des éléments déjà posés
 for i in range(24): #génération des listes suivant le format expliqué plus haut
     fixed.append([0,0,0,0,0,0,0,0,0,0])
     piece.append([0,0,0,0,0,0,0,0,0,0])
@@ -387,10 +391,10 @@ pause = 0
 dedpic = PhotoImage(file="ded.png")
 pausepic = PhotoImage(file="pause.png")
 
-main = Canvas(width=300,height=660,bg="black")
+main = Canvas(width=300,height=660,bg="black",highlightthickness=0)
 main.grid(row=0, column=0)
 
-aside = Canvas(width=140,height=660,bg="white")
+aside = Canvas(width=140,height=660,bg="white",highlightthickness=0)
 aside.grid(row=0, column=1)
 
 trace(fixed)
@@ -399,7 +403,6 @@ main.dtag("falling")
 resetpiece(1)
 master()
 
-master()
 wdw.bind("<Up>",lambda e:future(4))
 wdw.bind("<Down>",lambda e:future(3))
 wdw.bind("<Left>",lambda e:future(1))
