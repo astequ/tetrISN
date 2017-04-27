@@ -242,12 +242,15 @@ def death ():
         main.create_image(0,0, anchor=NW, image=dedpic) #on affiche l'écran de mort
 
 def reset (event): #recommence la partie
-    global fixed, piece, shade, keep
+    global fixed, piece, shade, keep, lines, score, level
     if keep == 0: #on ne peut recommencer que si la partie est perdue
         main.delete("all")
         fixed = []
         piece = []
         shade = []
+        lines = 0
+        score = 0
+        level = 0
         for i in range(24): #génération des listes suivant le format expliqué plus haut
             fixed.append([0,0,0,0,0,0,0,0,0,0])
             piece.append([0,0,0,0,0,0,0,0,0,0])
@@ -258,7 +261,7 @@ def reset (event): #recommence la partie
         print("meurs dignement, couard") #faut bien motiver le joueur :3
 
 def master (): #coordonne les autres fonctions, gère le rythme du jeu
-    global pos, piece, keep
+    global pos, piece, keep, level
     if check(1,0,pos,piece)==0: #pose la pièce si un déplacement vers le bas est impossible
         fixpiece()
         findline()
@@ -266,10 +269,15 @@ def master (): #coordonne les autres fonctions, gère le rythme du jeu
         future(3)
     death() #vérifie que la partie n'est pas perdue
     if keep == 1 and pause == 0: #se relance d'elle-même si la partie n'est pas perdue et le jeu n'est pas en pause
-        wdw.after(600,master)
+        if level < 30:
+            speed = int(round(725*(0.85**level)+level,0))
+        else:
+            speed = int(round(725*(0.85**29)+29,0))
+        wdw.after(speed,master)
 
 def findline(): #détecte une ligne complétée
     global fixed, shade
+    combo = 0
     for i in range (24): #parcourt toutes les lignes une à une
         if fixed[i] == [1,1,1,1,1,1,1,1,1,1]: #si la ligne est pleine
             fixed = fixed[:i] + fixed[i+1:] #on supprime la ligne
@@ -277,10 +285,29 @@ def findline(): #détecte une ligne complétée
             shade = shade[:i] + shade[i+1:] #on effectue les mêmes opérations pour la liste en charge des couleurs
             shade.insert(0,[0,0,0,0,0,0,0,0,0,0])
             main.delete("all") #on supprime puis on retrace tout
+            combo += 1
             for w in range(2,24):
                 for j in range(10):
                     if fixed[w][j] == 1:
                         main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill=color(shade[w][j]))
+    scoring(combo)
+
+def scoring(combo):
+    global lines, score, level
+    lines += combo
+    if combo == 1:
+        score += 40*(level+1)
+    elif combo == 2:
+        score += 100*(level+1)
+    elif combo == 3:
+        score += 300*(level+1)
+    elif combo == 4:
+        score += 1200*(level+1)
+    if lines >= (level+1)*10:
+        level += 1
+    if combo != 0:
+        print("SCORE: "+str(score)+"\nLEVEL: "+str(level)+"\nLIGNES: "+str(lines))
+        
 
 def ghost(): #aperçu du lieu de chute de la pièce
     main.delete("plop") #supprime l'ancien aperçu
@@ -390,6 +417,9 @@ keep = 1
 pause = 0
 dedpic = PhotoImage(file="ded.png")
 pausepic = PhotoImage(file="pause.png")
+lines = 0
+score = 0
+level = 0
 
 main = Canvas(width=300,height=660,bg="black",highlightthickness=0)
 main.grid(row=0, column=0)
