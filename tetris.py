@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 
 from tkinter import *
+from winsound import *
 from random import randint
 
 def coord(z): #permet de passer de coordonnées de type grille de jeu (10 de large, 22 de haut) à des coordonnées en pixels pour l'affichage (300 de large, 660 de haut)
@@ -415,11 +416,13 @@ for i in range(24): #génération des listes suivant le format expliqué plus ha
 flipok = 1
 keep = 1
 pause = 0
-dedpic = PhotoImage(file="ded.png")
-pausepic = PhotoImage(file="pause.png")
+dedpic = PhotoImage(file="resources/ded.png")
+pausepic = PhotoImage(file="resources/pause.png")
 lines = 0
 score = 0
 level = 0
+
+PlaySound("resources/theme.wav",SND_ASYNC | SND_LOOP)
 
 main = Canvas(width=300,height=660,bg="black",highlightthickness=0)
 main.grid(row=0, column=0)
