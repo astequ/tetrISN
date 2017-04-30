@@ -1,5 +1,0 @@
-On mettra toutes les images/sons ici à terme
-
-D'ailleurs pour le son c'est deux lignes :
-  from winsound import *
-  PlaySound("chemindufichier.wav",SND_ASYNC | SND_LOOP)
