@@ -271,9 +271,9 @@ def master (): #coordonne les autres fonctions, gère le rythme du jeu
     death() #vérifie que la partie n'est pas perdue
     if keep == 1 and pause == 0: #se relance d'elle-même si la partie n'est pas perdue et le jeu n'est pas en pause
         if level < 30:
-            speed = int(round(725*(0.85**level)+level,0))
+            speed = int(round(-18*level+600,0))
         else:
-            speed = int(round(725*(0.85**29)+29,0))
+            speed = int(round(-18*29+600,0))
         wdw.after(speed,master)
 
 def findline(): #détecte une ligne complétée
