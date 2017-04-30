@@ -307,8 +307,9 @@ def scoring(combo):
     if lines >= (level+1)*10:
         level += 1
     if combo != 0:
-        print("SCORE: "+str(score)+"\nLEVEL: "+str(level)+"\nLIGNES: "+str(lines))
-        
+        aside.itemconfig(scorelabel,text=str(score))
+        aside.itemconfig(levellabel,text=str(level))
+        aside.itemconfig(lineslabel,text=str(lines))
 
 def ghost(): #aperçu du lieu de chute de la pièce
     main.delete("plop") #supprime l'ancien aperçu
@@ -429,6 +430,14 @@ main.grid(row=0, column=0)
 
 aside = Canvas(width=140,height=660,bg="white",highlightthickness=0)
 aside.grid(row=0, column=1)
+
+aside.create_text(70,180,text="SCORE",font=("",22))
+aside.create_text(70,290,text="NIVEAU",font=("",22))
+aside.create_text(70,400,text="LIGNES",font=("",22))
+
+scorelabel = aside.create_text(70,230,text=str(score),font=("",22))
+levellabel = aside.create_text(70,340,text=str(level),font=("",22))
+lineslabel = aside.create_text(70,450,text=str(lines),font=("",22))
 
 trace(fixed)
 main.dtag("falling")
