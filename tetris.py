@@ -344,16 +344,12 @@ def fixpiece(): #fixe la position d'une pièce
             if piece[i][j] == 1:
                 shade[i][j] = shape
         piece[i] = [0,0,0,0,0,0,0,0,0,0] #réinitialise la liste contenant la pièce en mouvement
-    resetpiece(0)
+    resetpiece()
 
-def resetpiece(twice): #fait popper une nouvelle pièce et prévoit la suivante, est appelée par fixpiece()
+def resetpiece(): #fait popper une nouvelle pièce et prévoit la suivante, est appelée par fixpiece()
     global shape, state, pos, piece, nshape
-    if twice == 1: #génère deux nombres aléatoires pour le premier lancement
-        shape = randint(1,7)
-        nshape = randint(1,7)
-    else:
-        shape = nshape
-        nshape = randint(1,7)
+    shape = nshape
+    nshape = randint(1,7)
     preview() #trace l'aperçu
     state = 1 #initialise toutes les variables caractérisant la nouvelle pièce
     pos = (0,4)
@@ -417,6 +413,7 @@ for i in range(24): #génération des listes suivant le format expliqué plus ha
 flipok = 1
 keep = 1
 pause = 0
+nshape = randint(1,7)
 dedpic = PhotoImage(file="resources/ded.png")
 pausepic = PhotoImage(file="resources/pause.png")
 lines = 0
@@ -442,7 +439,7 @@ lineslabel = aside.create_text(70,450,text=str(lines),font=("",22))
 trace(fixed)
 main.dtag("falling")
 
-resetpiece(1)
+resetpiece()
 master()
 
 wdw.bind("<Up>",lambda e:future(4))
