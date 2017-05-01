@@ -243,7 +243,7 @@ def death ():
         main.create_image(0,0, anchor=NW, image=dedpic) #on affiche l'écran de mort
 
 def reset (event): #recommence la partie
-    global fixed, piece, shade, keep, lines, score, level
+    global fixed, piece, shade, keep, lines, score, level, nshape
     if keep == 0: #on ne peut recommencer que si la partie est perdue
         main.delete("all")
         fixed = []
@@ -252,6 +252,7 @@ def reset (event): #recommence la partie
         lines = 0
         score = 0
         level = 0
+        nshape = randint(1,7)
         for i in range(24): #génération des listes suivant le format expliqué plus haut
             fixed.append([0,0,0,0,0,0,0,0,0,0])
             piece.append([0,0,0,0,0,0,0,0,0,0])
