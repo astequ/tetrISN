@@ -324,7 +324,7 @@ def ghost(): #aperçu du lieu de chute de la pièce
     for w in range(2,24): #on trace l'aperçu en parcourant chaque case de la grille
         for j in range(10):
             if ghostpiece[w][j] == 1 and piece[w][j] == 0: #si la pièce en mouvement ne se superpose pas à son aperçu, on trace l'aperçu
-                main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill="dim gray",tags="plop")
+                main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill="dim gray",outline="gainsboro",tags="plop")
     return(ghostpiece) #retourne la position de la pièce, utile pour le hard drop
 
 def harddrop(event): #effectue un hard drop (pose la pièce instantanément au plus bas possible)
