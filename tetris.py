@@ -253,6 +253,7 @@ def reset (event): #recommence la partie
         score = 0
         level = 0
         nshape = randint(1,7)
+        preview()
         for i in range(24): #génération des listes suivant le format expliqué plus haut
             fixed.append([0,0,0,0,0,0,0,0,0,0])
             piece.append([0,0,0,0,0,0,0,0,0,0])
