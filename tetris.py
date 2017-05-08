@@ -166,7 +166,7 @@ def check(mov,fstate,pos,piece): #vérifie qu'un mouvement est valide
     #les trois premières conditions vérifient que le mouvement voulu ne fait pas sortir la pièce de l'aire de jeu, puis génère une liste contenant la position future de la pièce
     if mov == 1: #vérifie pour un déplacement vers le bas
         if future[-1] == [0,0,0,0,0,0,0,0,0,0]: #vérification que la pièce ne touche pas le sol
-            future == future[:-1] #génération de la liste
+            future = future[:-1] #génération de la liste
             future.insert(0,[0,0,0,0,0,0,0,0,0,0])
         else:
             out = 0
@@ -208,7 +208,7 @@ def check(mov,fstate,pos,piece): #vérifie qu'un mouvement est valide
                     out = 0
     return out #par défaut à 1 (action possible), la variable out sera mise à 0 (action impossible) à la moindre erreur détectée
 
-def future(direct): #gère les déplacements de la pièce actuelle
+def move(direct): #gère les déplacements de la pièce actuelle
     global pos, piece, state, shape, pause, keep
     if pause == 0 and keep == 1: #la pièce n'est déplaçable que si le jeu n'est pas en pause et que la partie est en cours
         temppos = pos
@@ -269,7 +269,7 @@ def master (): #coordonne les autres fonctions, gère le rythme du jeu
         fixpiece()
         findline()
     else: #effectue un déplacement vers le bas dans le cas inverse
-        future(3)
+        move(3)
     death() #vérifie que la partie n'est pas perdue
     if keep == 1 and pause == 0: #se relance d'elle-même si la partie n'est pas perdue et le jeu n'est pas en pause
         if level < 30:
@@ -444,10 +444,10 @@ main.dtag("falling")
 resetpiece()
 master()
 
-wdw.bind("<Up>",lambda e:future(4))
-wdw.bind("<Down>",lambda e:future(3))
-wdw.bind("<Left>",lambda e:future(1))
-wdw.bind("<Right>",lambda e:future(2))
+wdw.bind("<Up>",lambda e:move(4))
+wdw.bind("<Down>",lambda e:move(3))
+wdw.bind("<Left>",lambda e:move(1))
+wdw.bind("<Right>",lambda e:move(2))
 wdw.bind("<r>",reset)
 wdw.bind("<p>",ohwait)
 wdw.bind("<Return>",harddrop)
