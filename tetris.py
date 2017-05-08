@@ -272,7 +272,7 @@ def master (): #coordonne les autres fonctions, gère le rythme du jeu
         move(3)
     death() #vérifie que la partie n'est pas perdue
     if keep == 1 and pause == 0: #se relance d'elle-même si la partie n'est pas perdue et le jeu n'est pas en pause
-        if level < 30:
+        if level < 30: #la vitesse n'augmente que jusqu'au niveau 29
             speed = int(round(-18*level+600,0))
         else:
             speed = int(round(-18*29+600,0))
@@ -295,10 +295,10 @@ def findline(): #détecte une ligne complétée
                         main.create_rectangle(coord(j),coord(w-2),coord(j+1),coord(w-1),fill=color(shade[w][j]))
     scoring(combo)
 
-def scoring(combo):
+def scoring(combo): #gestion des scores
     global lines, score, level
-    lines += combo
-    if combo == 1:
+    lines += combo #ajout du nombre de lignes au total
+    if combo == 1: #calcul du score en fonction du nombre de lignes complétées
         score += 40*(level+1)
     elif combo == 2:
         score += 100*(level+1)
@@ -306,9 +306,9 @@ def scoring(combo):
         score += 300*(level+1)
     elif combo == 4:
         score += 1200*(level+1)
-    if lines >= (level+1)*10:
+    if lines >= (level+1)*10: #mise à jour du niveau toutes les  10 lignes
         level += 1
-    if combo != 0:
+    if combo != 0: #mise à jour de l'affichage des scores
         aside.itemconfig(scorelabel,text=str(score))
         aside.itemconfig(levellabel,text=str(level))
         aside.itemconfig(lineslabel,text=str(lines))
