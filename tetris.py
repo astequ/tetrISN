@@ -2,7 +2,7 @@
 
 from tkinter import *
 from winsound import *
-from random import randint
+from random import randint, choice
 
 def coord(z): #permet de passer de coordonnées de type grille de jeu (10 de large, 22 de haut) à des coordonnées en pixels pour l'affichage (300 de large, 660 de haut)
     return z*30
@@ -397,7 +397,7 @@ def ohwait(plz): #met le jeu en pause
             main.create_image(1,1, anchor=NW, image=pausepic, tags="pause") #on affiche l'écran de pause
         else: #si le jeu est en pause
             pause = 0 #on annule la pause
-            PlaySound("resources/theme.wav",SND_ASYNC | SND_LOOP) #on remet le son
+            PlaySound("resources/Theme"+choice(["A","B","C"])+".wav",SND_ASYNC | SND_LOOP) #on relance le son (musique choisie aléatoirement)
             main.delete("pause") #on supprime l'écran de pause
             master() #on relance la fonction principale
 
@@ -424,7 +424,7 @@ lines = 0
 score = 0
 level = 0
 
-PlaySound("resources/theme.wav",SND_ASYNC | SND_LOOP) #lancement de la musique
+PlaySound("resources/Theme"+choice(["A","B","C"])+".wav",SND_ASYNC | SND_LOOP) #lancement de la musique choisie aléatoirement
 
 main = Canvas(width=300,height=660,bg="black",highlightthickness=0)
 main.grid(row=0, column=0)
