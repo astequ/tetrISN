@@ -393,9 +393,11 @@ def ohwait(plz): #met le jeu en pause
     if keep == 1: #si la partie n'est pas perdue
         if pause == 0: #si le jeu n'est pas en pause
             pause = 1 #on met le jeu en pause
+            PlaySound(None,SND_PURGE) #on coupe le son
             main.create_image(1,1, anchor=NW, image=pausepic, tags="pause") #on affiche l'écran de pause
         else: #si le jeu est en pause
             pause = 0 #on annule la pause
+            PlaySound("resources/theme.wav",SND_ASYNC | SND_LOOP) #on remet le son
             main.delete("pause") #on supprime l'écran de pause
             master() #on relance la fonction principale
 
@@ -422,7 +424,7 @@ lines = 0
 score = 0
 level = 0
 
-PlaySound("resources/theme.wav",SND_ASYNC | SND_LOOP)
+PlaySound("resources/theme.wav",SND_ASYNC | SND_LOOP) #lancement de la musique
 
 main = Canvas(width=300,height=660,bg="black",highlightthickness=0)
 main.grid(row=0, column=0)
