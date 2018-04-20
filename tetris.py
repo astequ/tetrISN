@@ -252,6 +252,7 @@ def reset (event): #recommence la partie
         lines = 0
         score = 0
         level = 0
+        scoredisp()
         nshape = randint(1,7)
         preview()
         for i in range(24): #génération des listes suivant le format expliqué plus haut
@@ -309,9 +310,13 @@ def scoring(combo): #gestion des scores
     if lines >= (level+1)*10: #mise à jour du niveau toutes les  10 lignes
         level += 1
     if combo != 0: #mise à jour de l'affichage des scores
-        aside.itemconfig(scorelabel,text=str(score))
-        aside.itemconfig(levellabel,text=str(level))
-        aside.itemconfig(lineslabel,text=str(lines))
+        scoredisp()
+	
+def scoredisp():
+    global lines, score, level
+    aside.itemconfig(scorelabel,text=str(score))
+    aside.itemconfig(levellabel,text=str(level))
+    aside.itemconfig(lineslabel,text=str(lines))
 
 def ghost(): #aperçu du lieu de chute de la pièce
     main.delete("plop") #supprime l'ancien aperçu
